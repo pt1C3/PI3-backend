@@ -24,8 +24,9 @@ var _ticketproduto = require("./ticketproduto");
 var _user_status = require("./user_status");
 var _user_type = require("./user_type");
 var _version = require("./version");
+const sequelize = require('./database');
 
-function initModels(sequelize) {
+function initModels() {
   var USER = _USER(sequelize, DataTypes);
   var addon = _addon(sequelize, DataTypes);
   var category = _category(sequelize, DataTypes);
