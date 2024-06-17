@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-//Route - const filmesRouter = require('./routes/filmesRoutes.js');
+const produtosRouter = require('./routes/produtosRouter.js');
 
 
 //Configurações
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     }); 
 
 //Rotas
-//app.use('/filmes', filmesRouter);
+app.use('/produtos', produtosRouter);
 
 
 app.get('/', (req, res) => {

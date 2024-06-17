@@ -1,0 +1,97 @@
+const { Op } = require('sequelize'); //O Op serve para criar queries mais complexas usando o sequelize
+var sequelize = require('../models/database');
+const produtos = require('../models/produto');
+const initModels = require('../models/init-models'); // Adjust the path as needed
+const models = initModels(sequelize);
+
+const controller = {}
+sequelize.sync(); //Sincroniza com a DB
+
+//Listagem dos filmes
+controller.produtos_list = async (req, res) => { 
+    //const searchText = req.query.search || ""; 
+    const models = initModels(sequelize);
+
+    /*await produtos.findAll().then(data => {
+        res.json(data);
+    });*/
+}
+/*
+controller.filme_detail = async (req, res) => { ////Precisa de async, pois a página front-end dá erro, se não tiver filmes para listar
+    const itemId = req.params.id; //Id atribuido pelo parametro
+    filmes.findOne({ //Encontra o primeiro que...
+        where: {
+            id: itemId //tenha o id igual ao do request
+        },
+        include: 'genero' //Inclui o género
+    }).then(item => {
+        if (item) res.json(item); //Se o filme existir, retorna o json. Isto previne erros quando o utilizador escreve o id direto no URL da página.
+    })
+}
+
+//Criar filme
+controller.filme_create = async (req, res) => {
+    filmes.create({ //Criamos o item com a informação do request
+        descricao: req.body.descricao,
+        titulo: req.body.titulo,
+        foto: req.file.filename, //O ficheiro é recebido através do multer no filmesRouter.js
+        generoid: req.body.generoid
+    }).then(item => {
+            res.json(item); //Finalmente devolvemos o item criado
+        })
+}
+
+//Editar o filme
+controller.filme_update = async (req, res) => {
+    const itemId = req.params.id; //Recebemos o id atraves dos parametros
+
+    filmes.findByPk(itemId) //Procuramos o ficheiro pela Primary Key
+        .then(item => { //Então...
+            if (item) { //Verificamos se a pesquisa encontrou algo, se sim edita com a informação introduzida pelo utilizador.
+                item.descricao = req.body.descricao;
+                item.titulo = req.body.titulo;
+                (req.file) ? item.foto = req.file.filename : item.foto = item.foto; //Verificamos se o multer fez upload de algum ficheiro, se sim altera o item.foto, se não o item.foto mantém-se o mesmo
+                item.generoid = req.body.generoid;
+                return item.save();
+            }
+        })
+        .then(item => {
+            if (item) { //Se o item for encontrado no "findByPk" e passar pelo return...
+                res.json(item); //Devolvemo-lo, com as novas informações
+            }
+        })
+}
+
+//Remover o filme
+controller.filme_delete = (req, res) => {
+    const itemId = req.params.id; //Procura o ID nos parametros
+    filmes.destroy({ //Apaga o filme que...
+        where: {
+            id: itemId //...tiver o id igual ao parametro
+        }
+    }).then(res.send()) //Devolve o código 200 (de sucesso)
+}
+
+//Contagem dos filmes
+controller.filmes_count = async (req, res) => {
+    await filmes.count() //Conta quantos filmes existem na base de dados
+        .then(count => {
+            res.send(count.toString()); //Devolve a contagem
+        })
+}
+
+//Contagem dos filmes por géneros
+controller.filme_genero_count = async (req, res) => {
+    await filmes.findAll({
+        attributes: ['generoid', [sequelize.fn('COUNT', sequelize.col('*')), 'filme_count']], //Faz a contagem de generoid para a coluna "filme_count"
+        group: ['generoid', 'genero.id'], //Agrupa por género
+        include: [{
+            model: generos,
+            attributes: ['id', 'designacao'], //Inclui o nome e o id do género
+        }]
+    }).then(data => {
+        res.json(data); //Devolve todas as contagens, mas apenas os generos que têm filmes, para os géneros sem filmes é feita outra query em home.js (frontend)
+    })
+}
+    */
+module.exports = controller;

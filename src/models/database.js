@@ -1,13 +1,21 @@
 var Sequelize = require('sequelize');
 const sequelize = new Sequelize(
-    'pi3_logicleap_db',
-    'user',
-    'Yodqao0zoPNMbaOJTCTUEmbn1VXWOiEt',
+    'PI3',
+    'postgres',
+    '123',
     {
-        host: 'dpg-cp66cq6n7f5s73a82f20-a',
+        host: 'localhost',
         port: '5432',
-        dialect: 'postgres',
-        logging: false
+        dialect: 'postgres'
     }
 );
+sequelize.sync();
+sequelize.authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch((error) => {
+    console.error('Unable to connect to the database:', error);
+  });
+
 module.exports = sequelize;

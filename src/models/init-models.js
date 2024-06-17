@@ -150,6 +150,7 @@ function initModels() {
     version,
   };
 }
+
 module.exports = initModels;
 module.exports.initModels = initModels;
 module.exports.default = initModels;
