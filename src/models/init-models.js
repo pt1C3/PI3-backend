@@ -140,6 +140,7 @@ function initModels() {
     plan_status,
     price,
     produto,
+    produto_status,
     produtos_do_pacote,
     requeriments,
     support_ticket,

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const produtosRouter = require('./routes/produtosRouter.js');
+const categoryRouter = require('./routes/categoryRouter.js');
 
 
 //Configurações
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
 
 //Rotas
 app.use('/produtos', produtosRouter);
+app.use('/category', categoryRouter);
 
 
 app.get('/', (req, res) => {
