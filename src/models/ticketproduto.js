@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'produto',
+        model: 'product',
         key: 'productid'
       }
     }
@@ -31,12 +31,6 @@ module.exports = function(sequelize, DataTypes) {
         fields: [
           { name: "ticketid" },
           { name: "productid" },
-        ]
-      },
-      {
-        name: "ticketproduto2_fk",
-        fields: [
-          { name: "ticketid" },
         ]
       },
       {

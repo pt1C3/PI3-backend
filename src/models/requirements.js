@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('requeriments', {
+  return sequelize.define('requirements', {
     reqid: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -33,12 +33,12 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'requeriments',
+    tableName: 'requirements',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "pk_requeriments",
+        name: "pk_requirements",
         unique: true,
         fields: [
           { name: "reqid" },

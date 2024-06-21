@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('licensestatus', {
-    lstatusid: {
-      autoIncrement: true,
+  return sequelize.define('product_status', {
+    pstatusid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
@@ -13,22 +12,22 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'licensestatus',
+    tableName: 'product_status',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "licensestatus_pk",
+        name: "licensestatus_pk2",
         unique: true,
         fields: [
-          { name: "lstatusid" },
+          { name: "pstatusid" },
         ]
       },
       {
-        name: "pk_licensestatus",
+        name: "pk_product_status",
         unique: true,
         fields: [
-          { name: "lstatusid" },
+          { name: "pstatusid" },
         ]
       },
     ]

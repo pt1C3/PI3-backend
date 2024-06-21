@@ -11,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'produto',
+        model: 'product',
         key: 'productid'
       }
     },
@@ -27,9 +27,13 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    status: {
-      type: DataTypes.STRING(255),
-      allowNull: true
+    statusid: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'version_status',
+        key: 'vstatusid'
+      }
     },
     releasenotes: {
       type: DataTypes.TEXT,
@@ -47,7 +51,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'requeriments',
+        model: 'requirements',
         key: 'reqid'
       }
     }
@@ -68,6 +72,12 @@ module.exports = function(sequelize, DataTypes) {
         name: "possue_fk",
         fields: [
           { name: "reqid" },
+        ]
+      },
+      {
+        name: "status_da_versao_fk",
+        fields: [
+          { name: "statusid" },
         ]
       },
       {

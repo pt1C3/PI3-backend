@@ -1,20 +1,20 @@
 const { Op } = require('sequelize'); //O Op serve para criar queries mais complexas usando o sequelize
 var sequelize = require('../models/database');
 const initModels = require('../models/init-models');
-const {produto} = initModels();
+const {product} = initModels(sequelize);
 
 const controller = {}
 sequelize.sync(); //Sincroniza com a DB
 
 //Listagem dos filmes
 controller.produtos_list = async (req, res) => {
-    await produto.findAll().then(data => {
+    await product.findAll().then(data => {
         res.json(data);
     });
 }
 //Criar filme
 controller.produtos_add = async (req, res) => {
-    produto.create({ //Criamos o item com a informação do request
+    product.create({ //Criamos o item com a informação do request
         name: req.body.name,
         description: req.body.description,
         status: req.body.status,

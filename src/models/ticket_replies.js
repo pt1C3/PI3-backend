@@ -1,52 +1,41 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('empresa', {
-    businessid: {
-      autoIncrement: true,
+  return sequelize.define('ticket_replies', {
+    treplyid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    userid: {
+    ticketid: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'USER',
-        key: 'userid'
+        model: 'support_ticket',
+        key: 'ticketid'
       }
     },
-    name: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    website: {
+    reply: {
       type: DataTypes.TEXT,
       allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'empresa',
+    tableName: 'ticket_replies',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "empresa_pk",
+        name: "pk_ticket_replies",
         unique: true,
         fields: [
-          { name: "businessid" },
+          { name: "treplyid" },
         ]
       },
       {
-        name: "pk_empresa",
+        name: "ticket_reply_pk",
         unique: true,
         fields: [
-          { name: "businessid" },
-        ]
-      },
-      {
-        name: "userempresa_fk",
-        fields: [
-          { name: "userid" },
+          { name: "treplyid" },
         ]
       },
     ]

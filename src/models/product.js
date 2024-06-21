@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('produto', {
+  return sequelize.define('product', {
     productid: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -23,9 +23,13 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    status: {
-      type: DataTypes.STRING(255),
-      allowNull: true
+    statusid: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'product_status',
+        key: 'pstatusid'
+      }
     },
     icon: {
       type: DataTypes.TEXT,
@@ -37,7 +41,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'produto',
+    tableName: 'product',
     schema: 'public',
     timestamps: false,
     indexes: [
@@ -48,7 +52,7 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "pk_produto",
+        name: "pk_product",
         unique: true,
         fields: [
           { name: "productid" },
@@ -59,6 +63,12 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         fields: [
           { name: "productid" },
+        ]
+      },
+      {
+        name: "status_do_produto_fk",
+        fields: [
+          { name: "statusid" },
         ]
       },
     ]

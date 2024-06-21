@@ -1,7 +1,7 @@
 const { Op } = require('sequelize'); //O Op serve para criar queries mais complexas usando o sequelize
 var sequelize = require('../models/database');
 const initModels = require('../models/init-models');
-const {category} = initModels();
+const {category} = initModels(sequelize);
 
 const controller = {}
 sequelize.sync(); //Sincroniza com a DB

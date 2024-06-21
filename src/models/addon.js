@@ -11,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'produto',
+        model: 'product',
         key: 'productid'
       }
     },
@@ -20,8 +20,12 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     status: {
-      type: DataTypes.STRING(255),
-      allowNull: true
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'product_status',
+        key: 'pstatusid'
+      }
     },
     icon: {
       type: DataTypes.TEXT,

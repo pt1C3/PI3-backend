@@ -11,16 +11,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'empresa',
+        model: 'business',
         key: 'businessid'
-      }
-    },
-    notificationid: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'notification',
-        key: 'notificationid'
       }
     },
     ustatusid: {
@@ -77,12 +69,6 @@ module.exports = function(sequelize, DataTypes) {
     schema: 'public',
     timestamps: false,
     indexes: [
-      {
-        name: "notification_fk",
-        fields: [
-          { name: "notificationid" },
-        ]
-      },
       {
         name: "pk_user",
         unique: true,
