@@ -1,16 +1,47 @@
 const { Op } = require('sequelize'); //O Op serve para criar queries mais complexas usando o sequelize
 var sequelize = require('../models/database');
 const initModels = require('../models/init-models');
-const {product} = initModels(sequelize);
+const { product, category, price } = initModels(sequelize);
 
 const controller = {}
 sequelize.sync(); //Sincroniza com a DB
 
 //Listagem dos filmes
-controller.produtos_list = async (req, res) => {
-    await product.findAll().then(data => {
+controller.produtos_min_list = async (req, res) => {
+    await product.findAll({
+        attributes: [
+          'name',
+          'icon',
+          'description'
+        ],
+        include: [
+          {
+            model: category,
+            as: 'category',
+            attributes: ['designation']
+          },
+          {
+            model: price,
+            as: 'prices',
+            attributes: ['price', 'discount_percentage'],
+            where: {
+              change_date: {
+                [Op.eq]: sequelize.literal(`(
+                  SELECT MAX(subPrice.change_date)
+                  FROM price AS subPrice
+                  WHERE subPrice.productid = prices.productid
+                )`)
+              }
+            },
+            required: true // Ensures only products with associated prices are returned
+          }
+        ]
+      }).then(data => {
         res.json(data);
-    });
+      });
+      
+
+
 }
 //Criar filme
 controller.produtos_add = async (req, res) => {
@@ -22,8 +53,8 @@ controller.produtos_add = async (req, res) => {
         features: req.body.features,
         categoryid: req.body.categoryid
     }).then(item => {
-            res.json(item); //Finalmente devolvemos o item criado
-        })
+        res.json(item); //Finalmente devolvemos o item criado
+    })
 }
 /*
 controller.filme_detail = async (req, res) => { ////Precisa de async, pois a página front-end dá erro, se não tiver filmes para listar

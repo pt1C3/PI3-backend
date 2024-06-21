@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }); //Cria a função/middleware responsável por fazer o upload dos ficheiros
 */
 
-router.get('/', controller.produtos_list);
+router.get('/', controller.produtos_min_list);
 router.post('/create', /*upload.single('foto'),*/ controller.produtos_add); //O middleware é chamado antes do controller
 
 /*router.put('/update/:id', upload.single('foto'), controller.filme_update); //O middleware é chamado antes do controller
