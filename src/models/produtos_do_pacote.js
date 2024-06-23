@@ -39,14 +39,6 @@ module.exports = function(sequelize, DataTypes) {
           { name: "packageid" },
         ]
       },
-      {
-        name: "produtos_do_pacote_pk",
-        unique: true,
-        fields: [
-          { name: "packageid" },
-          { name: "productid" },
-        ]
-      },
     ]
   });
 };

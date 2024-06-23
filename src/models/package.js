@@ -15,6 +15,14 @@ module.exports = function(sequelize, DataTypes) {
         key: 'categoryid'
       }
     },
+    pstatusid: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'product_status',
+        key: 'pstatusid'
+      }
+    },
     name: {
       type: DataTypes.STRING(255),
       allowNull: true

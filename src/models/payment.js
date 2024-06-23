@@ -22,6 +22,14 @@ module.exports = function(sequelize, DataTypes) {
         model: 'payment_status',
         key: 'pstatusid'
       }
+    },
+    payment_date: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    due_date: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,

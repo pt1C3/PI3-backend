@@ -116,6 +116,8 @@ function initModels(sequelize) {
   product.hasMany(version, { as: "versions", foreignKey: "productid"});
   addon.belongsTo(product_status, { as: "status_product_status", foreignKey: "status"});
   product_status.hasMany(addon, { as: "addons", foreignKey: "status"});
+  package.belongsTo(product_status, { as: "pstatus", foreignKey: "pstatusid"});
+  product_status.hasMany(package, { as: "packages", foreignKey: "pstatusid"});
   product.belongsTo(product_status, { as: "status", foreignKey: "statusid"});
   product_status.hasMany(product, { as: "products", foreignKey: "statusid"});
   version.belongsTo(requirements, { as: "req", foreignKey: "reqid"});

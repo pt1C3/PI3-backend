@@ -1,10 +1,10 @@
 var Sequelize = require('sequelize');
 const sequelize = new Sequelize(
-    'PI3',
-    'postgres',
-    '123',
+    'pi3_h6fb',
+    'pi3_h6fb_user',
+    'KOk0OGUYIHbmVRgau1eioao2ZT6Z5m1s',
     {
-        host: 'localhost',
+        host: 'dpg-cps6jg08fa8c7392h0e0-a',
         port: '5432',
         dialect: 'postgres'
     }

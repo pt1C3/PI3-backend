@@ -27,10 +27,6 @@ module.exports = function(sequelize, DataTypes) {
         key: 'pstatusid'
       }
     },
-    icon: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
     description: {
       type: DataTypes.TEXT,
       allowNull: true
