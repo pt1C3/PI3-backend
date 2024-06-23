@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const produtosRouter = require('./routes/produtosRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js');
-const initModels = require('../models/init-models');
+const initModels = require('./models/init-models');
 var sequelize = require('./models/database');
 
 //Configurações
