@@ -41,7 +41,6 @@ function initModels(sequelize) {
   var category = _category(sequelize, DataTypes);
   var product = _product(sequelize, DataTypes);
   var images = _images(sequelize, DataTypes);
-  var USER = _USER(sequelize, DataTypes);
   var addon = _addon(sequelize, DataTypes);
   var business = _business(sequelize, DataTypes);
   var faq = _faq(sequelize, DataTypes);
@@ -148,7 +147,6 @@ function initModels(sequelize) {
     category,
     product,
     images,
-    USER,
     addon,
     business,
     faq,
@@ -164,6 +162,8 @@ function initModels(sequelize) {
     ticket_replies,
     ticketproduto,
     version,
+    USER,
+
   };
 }
 
