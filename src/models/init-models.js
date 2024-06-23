@@ -44,13 +44,13 @@ function initModels(sequelize) {
   var addon = _addon(sequelize, DataTypes);
   var business = _business(sequelize, DataTypes);
   var USER = _USER(sequelize, DataTypes);
+  var package = _package(sequelize, DataTypes);
   var faq = _faq(sequelize, DataTypes);
   var price = _price(sequelize, DataTypes);
   var plan = _plan(sequelize, DataTypes);
   var payment = _payment(sequelize, DataTypes);
   var license = _license(sequelize, DataTypes);
   var notification = _notification(sequelize, DataTypes);
-  var package = _package(sequelize, DataTypes);
   var produtos_do_pacote = _produtos_do_pacote(sequelize, DataTypes);
   var requirements = _requirements(sequelize, DataTypes);
   var support_ticket = _support_ticket(sequelize, DataTypes);
@@ -151,13 +151,13 @@ function initModels(sequelize) {
     addon,
     business,
     USER,
+    package,
     faq,
     price,
     plan,
     payment,
     license,
     notification,
-    package,
     produtos_do_pacote,
     requirements,
     support_ticket,
