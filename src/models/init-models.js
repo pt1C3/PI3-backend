@@ -43,6 +43,7 @@ function initModels(sequelize) {
   var images = _images(sequelize, DataTypes);
   var addon = _addon(sequelize, DataTypes);
   var business = _business(sequelize, DataTypes);
+  var USER = _USER(sequelize, DataTypes);
   var faq = _faq(sequelize, DataTypes);
   var price = _price(sequelize, DataTypes);
   var plan = _plan(sequelize, DataTypes);
@@ -149,6 +150,7 @@ function initModels(sequelize) {
     images,
     addon,
     business,
+    USER,
     faq,
     price,
     plan,
@@ -162,7 +164,6 @@ function initModels(sequelize) {
     ticket_replies,
     ticketproduto,
     version,
-    USER,
 
   };
 }
