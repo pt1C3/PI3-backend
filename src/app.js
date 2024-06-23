@@ -2,8 +2,6 @@ const express = require('express');
 const app = express();
 const produtosRouter = require('./routes/produtosRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js');
-const initModels = require('./models/init-models');
-var sequelize = require('./models/database');
 
 //Configurações
 app.set('port', process.env.PORT || 3000);
@@ -25,7 +23,6 @@ app.use('/category', categoryRouter);
 
 
 app.get('/', (req, res) => {
-    initModels(sequelize);
     res.send('Backend');
 });
 
