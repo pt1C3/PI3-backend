@@ -56,6 +56,11 @@ controller.produtos_add = async (req, res) => {
         res.json(item); //Finalmente devolvemos o item criado
     })
 }
+controller.apenasum = async (req,res) => {
+    await sequelize.query(`
+        INSERT INTO Users (firstName, lastName, email)
+        VALUES ('John', 'Smith', 'john.smith@example.com')
+      `);}
 /*
 controller.filme_detail = async (req, res) => { ////Precisa de async, pois a página front-end dá erro, se não tiver filmes para listar
     const itemId = req.params.id; //Id atribuido pelo parametro
