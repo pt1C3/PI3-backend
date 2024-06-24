@@ -7,7 +7,7 @@ const categoryRouter = require('./routes/categoryRouter.js');
 app.set('port', process.env.PORT || 3000);
 
 app.use(express.json());
-
+app.use(express.static(path.join(__dirname, '../public')));
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
