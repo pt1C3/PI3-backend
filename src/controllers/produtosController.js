@@ -10,40 +10,40 @@ sequelize.sync(); //Sincroniza com a DB
 controller.produtos_min_list = async (req, res) => {
     await product.findAll({
         attributes: [
-          'name',
-          'icon',
-          'description'
+            'name',
+            'icon',
+            'description'
         ],
         include: [
-          {
-            model: category,
-            as: 'category',
-            attributes: ['designation']
-          },
-          {
-            model: price,
-            as: 'prices',
-            attributes: ['price', 'discount_percentage'],
-            where: {
-              change_date: {
-                [Op.eq]: sequelize.literal(`(
-                  SELECT MAX(subPrice.change_date)
-                  FROM price AS subPrice
-                  WHERE subPrice.productid = prices.productid
-                )`)
-              }
+            {
+                model: category,
+                as: 'category',
+                attributes: ['designation']
             },
-            required: true // Ensures only products with associated prices are returned
-          }
+            {
+                model: price,
+                as: 'prices',
+                attributes: ['price', 'discount_percentage'],
+                where: {
+                    price: {
+                        [Op.eq]: sequelize.literal(`(
+                            SELECT MIN(subPrice.price)
+                            FROM price AS subPrice
+                            WHERE subPrice.productid = prices.productid
+                        )`)
+                    }
+                },
+                required: true
+            }
         ]
-      }).then(data => {
+    }).then(data => {
         res.json(data);
-      });
-      
+    });
 
 
+
+    
 }
-//Criar filme
 controller.produtos_add = async (req, res) => {
     product.create({ //Criamos o item com a informação do request
         name: req.body.name,
