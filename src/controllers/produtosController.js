@@ -8,6 +8,10 @@ sequelize.sync(); //Sincroniza com a DB
 
 //Listagem dos filmes
 controller.produtos_min_list = async (req, res) => {
+    await product.findAll().then(data => {
+        res.json(data);
+    });
+    /*
     await product.findAll({
         attributes: [
             'name',
@@ -39,7 +43,7 @@ controller.produtos_min_list = async (req, res) => {
     }).then(data => {
         res.json(data);
     });
-
+*/
 
 
     
@@ -223,7 +227,7 @@ controller.apenasum = async (req,res) => {
         (4, NULL, '1.0.0', 2, 'Initial release of FunStream with high-quality streaming capabilities.', '2024-01-01', '(endereço web para download)', 4),
         (NULL, 5, '1.1.0', 2, 'High-Quality Streaming addon for FunStream.', '2024-02-01', '(endereço web para download)', NULL),
         (5, NULL, '1.0.0', 2, 'Initial release of ChatSphere with communication tools.', '2024-01-01', '(endereço web para download)', 5);
-      `);}
+      `).then(()=>{res.send("foi?")});}
 /*
 controller.filme_detail = async (req, res) => { ////Precisa de async, pois a página front-end dá erro, se não tiver filmes para listar
     const itemId = req.params.id; //Id atribuido pelo parametro
