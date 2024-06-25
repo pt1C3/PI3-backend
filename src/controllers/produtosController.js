@@ -61,6 +61,9 @@ controller.produtos_add = async (req, res) => {
     })
 }
 controller.apenasum = async (req, res) => {
+    try{
+
+   
     await sequelize.query(`
 
         INSERT INTO PRODUCT_STATUS (DESIGNATION) VALUES ('Hidden'), ('Visible'), ('Removed');
@@ -228,6 +231,10 @@ controller.apenasum = async (req, res) => {
         (NULL, 5, '1.1.0', 2, 'High-Quality Streaming addon for FunStream.', '2024-02-01', '(endereço web para download)', NULL),
         (5, NULL, '1.0.0', 2, 'Initial release of ChatSphere with communication tools.', '2024-01-01', '(endereço web para download)', 5);
       `).then(() => { res.send("foi?") });
+    }
+    catch(e){
+        res.send("Erro: " + e)
+    }
 }
 /*
 controller.filme_detail = async (req, res) => { ////Precisa de async, pois a página front-end dá erro, se não tiver filmes para listar
