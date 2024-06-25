@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
 const sequelize = new Sequelize(
-  'pi3_qpsn',
+ 'pi3_qpsn',
   'pi3_qpsn_user',
   'YHxHh12yMpPSSXJ34p7fPpZa8s3cnDOm',
   {
@@ -8,7 +8,7 @@ const sequelize = new Sequelize(
     port: '5432',
     dialect: 'postgres'
   }
-  /*
+ /*
   'pi3',
   'postgres',
   '123',
@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
       port: '5432',
       dialect: 'postgres'
   }
-      */
+     */   
 );
 sequelize.sync();
 sequelize.authenticate()

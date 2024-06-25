@@ -19,7 +19,7 @@ app.use((req, res, next) => {
     }); 
 
 //Rotas
-app.use('/produtos', produtosRouter);
+app.use('/product', produtosRouter);
 app.use('/category', categoryRouter);
 
 
