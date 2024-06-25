@@ -46,7 +46,7 @@ controller.produtos_min_list = async (req, res) => {
 */
 
 
-    
+
 }
 controller.produtos_add = async (req, res) => {
     product.create({ //Criamos o item com a informação do request
@@ -60,7 +60,7 @@ controller.produtos_add = async (req, res) => {
         res.json(item); //Finalmente devolvemos o item criado
     })
 }
-controller.apenasum = async (req,res) => {
+controller.apenasum = async (req, res) => {
     await sequelize.query(`
 
         INSERT INTO PRODUCT_STATUS (DESIGNATION) VALUES ('Hidden'), ('Visible'), ('Removed');
@@ -227,7 +227,8 @@ controller.apenasum = async (req,res) => {
         (4, NULL, '1.0.0', 2, 'Initial release of FunStream with high-quality streaming capabilities.', '2024-01-01', '(endereço web para download)', 4),
         (NULL, 5, '1.1.0', 2, 'High-Quality Streaming addon for FunStream.', '2024-02-01', '(endereço web para download)', NULL),
         (5, NULL, '1.0.0', 2, 'Initial release of ChatSphere with communication tools.', '2024-01-01', '(endereço web para download)', 5);
-      `).then(()=>{res.send("foi?")});}
+      `).then(() => { res.send("foi?") });
+}
 /*
 controller.filme_detail = async (req, res) => { ////Precisa de async, pois a página front-end dá erro, se não tiver filmes para listar
     const itemId = req.params.id; //Id atribuido pelo parametro
