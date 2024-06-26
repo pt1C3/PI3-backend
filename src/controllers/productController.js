@@ -1,13 +1,14 @@
 const { Op, fn, col, literal } = require('sequelize');
 var sequelize = require('../models/database');
 const initModels = require('../models/init-models');
-const { product, category, price, images, version, faq, requirements} = initModels(sequelize);
+const { product, category, price, images, version, faq, requirements } = initModels(sequelize);
+const bcrypt = require('bcrypt');
 
 const controller = {}
 sequelize.sync(); //Sincroniza com a DB
 
 //Listagem dos filmes
-controller.produtos_min_list = async (req, res) => {
+controller.products_min_list = async (req, res) => {
     await product.findAll({
         attributes: [
             'productid',
@@ -45,18 +46,6 @@ controller.produtos_min_list = async (req, res) => {
     });
 
 }
-controller.produtos_add = async (req, res) => {
-    product.create({ //Criamos o item com a informação do request
-        name: req.body.name,
-        description: req.body.description,
-        status: req.body.status,
-        //icon: req.file.filename, //O ficheiro é recebido através do multer no filmesRouter.js
-        features: req.body.features,
-        categoryid: req.body.categoryid
-    }).then(item => {
-        res.json(item); //Finalmente devolvemos o item criado
-    })
-}
 
 controller.single_product = async (req, res) => {
     const productId = req.params.id; // Assuming the product ID is passed as a route parameter
@@ -90,7 +79,8 @@ controller.single_product = async (req, res) => {
                 attributes: [
                     [fn('ROUND', col('price'), 2), 'price'], // Format price to 2 decimal points
                     'discount_percentage',
-                    'number_of_licenses'
+                    'number_of_licenses',
+                    'priceid'
                 ],
                 order: [['price', 'ASC']], // Order prices from lower to higher
             },
@@ -125,11 +115,69 @@ controller.single_product = async (req, res) => {
     });
 }
 
+controller.product_add = async (req, res) => {
+    product.create({ //Criamos o item com a informação do request
+        name: req.body.name,
+        description: req.body.description,
+        status: req.body.status,
+        //icon: req.file.filename, //O ficheiro é recebido através do multer no filmesRouter.js
+        features: req.body.features,
+        categoryid: req.body.categoryid
+    }).then(item => {
+        res.json(item); //Finalmente devolvemos o item criado
+    })
+}
+
+controller.search_products_list = async (req, res) => {
+    const search = req.params.search;
+    await product.findAll({
+        attributes: [
+            'productid',
+            'name',
+            'icon',
+            'description'
+        ],
+        where: {
+            name: {
+                [Op.like]: `%${search}%` // Use % for wildcard matching
+            }
+        },
+        include: [
+            {
+                model: category,
+                as: 'category',
+                attributes: ['designation']
+            },
+            {
+                model: price,
+                as: 'prices',
+                attributes: [
+                    [fn('ROUND', col('price'), 2), 'price'], // Format price to 2 decimal points
+                    'discount_percentage'
+                ],
+                where: {
+                    price: {
+                        [Op.eq]: sequelize.literal(`(
+                            SELECT MIN(subPrice.price)
+                            FROM price AS subPrice
+                            WHERE subPrice.productid = prices.productid
+                        )`)
+                    }
+                },
+                required: true
+            }
+        ]
+    }).then(data => {
+        res.json(data);
+    });
+
+}
+/*
 controller.apenasum = async (req, res) =>{
     sequelize.query(`INSERT INTO PRODUCT (CATEGORYID, NAME, DESCRIPTION, STATUSID, ICON, FEATURES) VALUES (1, 'DesignSphere', 'Unleash your creativity with DesignSphere, the ultimate platform for graphic design and visual communication. Whether you''re crafting stunning visuals, designing logos, or creating intricate layouts, DesignSphere empowers you to bring your ideas to life with ease and precision.', 2, 'https://pi3-backend.onrender.com/images/products/icon/6.png', 'DesignSphere offers a comprehensive suite of tools tailored for graphic designers and visual storytellers. Dive into a seamless design experience with intuitive features that enhance your creative workflow.[p]Craft eye-catching graphics and logos effortlessly using DesignSphere''s robust tools and dynamic workspace. Explore a rich palette of colors, shapes, and textures to create visually stunning masterpieces that captivate your audience.[p]Enhance collaboration with seamless file-sharing and integration with popular design formats. DesignSphere''s secure cloud storage ensures your projects are safely backed up and accessible from anywhere, allowing you to work on multiple devices without missing a beat.[p]Customize your design environment with personalized themes and layouts that suit your creative style. From beginners to seasoned professionals, DesignSphere adapts to your needs with intuitive navigation and real-time collaboration features.[p]Stay organized with advanced project management tools and integration with popular productivity apps. DesignSphere supports seamless scheduling and synchronization with calendar applications, ensuring you never miss a deadline.[p]Whether you''re designing for print or digital media, DesignSphere empowers you to unleash your creativity and elevate your design process to new heights.');
 `).then(()=>res.send('foi?'))
 }
-/*
+
 
 
 

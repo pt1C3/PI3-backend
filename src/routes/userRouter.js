@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/produtosController');
+const middleware = require('./middleware');
+const controller = require('../controllers/userController');
 
 /*const multer = require('multer'); //Serve para facilitar o upload de ficheiros, age como um middleware, antes das funções dos controllers
 
@@ -17,13 +18,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }); //Cria a função/middleware responsável por fazer o upload dos ficheiros
 */
 
-router.get('/', controller.produtos_min_list);
-router.post('/create', /*upload.single('foto'),*/ controller.produtos_add); //O middleware é chamado antes do controller
-router.get('/soum', controller.apenasum);
+router.get('/', controller.users_list);
+router.post('/login', controller.login);
 
-router.get('/:id', controller.single_product);
-
+//router.post('/create', /*upload.single('foto'),*/ controller.produtos_add); //O middleware é chamado antes do controller
 /*
+router.get('/soum', controller.apenasum);
 router.put('/update/:id', upload.single('foto'), controller.filme_update); //O middleware é chamado antes do controller
 router.delete('/delete/:id', controller.filme_delete);
 router.get('/count/', controller.filmes_count);

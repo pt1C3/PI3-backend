@@ -1,9 +1,12 @@
 const express = require('express');
+const stripe = require('stripe')('sk_test_51PVjYGAJPMUjqPpZZ7cLrPaEv475zBqe8ct0WgsqHOVjYjvr4JhfCDELUFESkc5rUcATJ0A1WGUd7VktRJbeyPjV00Xbrg47lL');
 const path = require('path');
 
 const app = express();
-const produtosRouter = require('./routes/produtosRouter.js');
+const produtosRouter = require('./routes/productRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js');
+const userRouter = require('./routes/userRouter.js');
+
 //Configurações
 app.set('port', process.env.PORT || 3000);
 
@@ -17,10 +20,28 @@ app.use((req, res, next) => {
     res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
     next();
     }); 
+    
+app.post('/create-payment-intent', async (req, res) => {
+    const { amount, currency } = req.body;
+  
+    try {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency,
+      });
+  
+      res.status(200).json({ clientSecret: paymentIntent.client_secret });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+  
+
 
 //Rotas
 app.use('/product', produtosRouter);
 app.use('/category', categoryRouter);
+app.use('/user', userRouter);
 
 
 app.get('/', (req, res) => {
