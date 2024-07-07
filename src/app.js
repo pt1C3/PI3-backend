@@ -5,7 +5,10 @@ const path = require('path');
 const app = express();
 const produtosRouter = require('./routes/productRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js');
+const businessRouter = require('./routes/businessRouter.js');
+const versionRouter = require('./routes/versionRouter.js');
 const userRouter = require('./routes/userRouter.js');
+const ownerRouter = require('./routes/ownerRouter.js');
 
 //Configurações
 app.set('port', process.env.PORT || 3000);
@@ -41,7 +44,10 @@ app.post('/create-payment-intent', async (req, res) => {
 //Rotas
 app.use('/product', produtosRouter);
 app.use('/category', categoryRouter);
+app.use('/business', businessRouter);
+app.use('/version', versionRouter);
 app.use('/user', userRouter);
+app.use('/owner', ownerRouter);
 
 
 app.get('/', (req, res) => {
