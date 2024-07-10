@@ -19,8 +19,9 @@ const upload = multer({ storage: storage }); //Cria a função/middleware respon
 
 router.get('/', controller.products_min_list);
 router.get('/search/:search', controller.search_products_list);
-//router.post('/create', /*upload.single('foto'),*/ controller.produtos_add); //O middleware é chamado antes do controller
-
+//router.post('/create', controller.produtos_add); 
+router.get('/admin/list/:search?', controller.admin_list_products);
+router.get('/admin/versions/:productid', controller.admin_versions_product)
 router.get('/:id', controller.single_product);
 /*
 router.get('/soum', controller.apenasum);
