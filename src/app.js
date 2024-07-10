@@ -9,6 +9,7 @@ const businessRouter = require('./routes/businessRouter.js');
 const versionRouter = require('./routes/versionRouter.js');
 const userRouter = require('./routes/userRouter.js');
 const ownerRouter = require('./routes/ownerRouter.js');
+const addonRouter = require('./routes/addonRouter.js');
 
 //Configurações
 app.set('port', process.env.PORT || 3000);
@@ -48,6 +49,7 @@ app.use('/business', businessRouter);
 app.use('/version', versionRouter);
 app.use('/user', userRouter);
 app.use('/owner', ownerRouter);
+app.use('/addon', addonRouter);
 
 
 app.get('/', (req, res) => {
