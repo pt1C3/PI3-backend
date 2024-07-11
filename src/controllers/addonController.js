@@ -114,4 +114,30 @@ controller.admin_list_addon = async (req, res) => {
         });
 }
 
+controller.admin_versions_addon = async (req, res)=>{
+    const addonid = req.params.addonid;
+
+    await version.findAll({
+        where: {
+            addonid: addonid
+        },
+        include: [{
+            model: version_status,
+            as: "status"
+        },{
+            model: addon,
+            as: "addon",
+            attributes: ['name', 'productid'],
+            include: {
+                model: product,
+                as: "product"
+            }
+        }]
+    }).then(data => { res.json(data) });
+}
+
+controller.single_addon = async (req,res)=>{
+    const {addonid} = req.params;
+    await addon.findOne({where: {addonid: addonid}}).then(data => res.json(data));
+}
 module.exports = controller;

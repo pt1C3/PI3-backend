@@ -7,7 +7,10 @@ const controller = {}
 sequelize.sync(); //Sincroniza com a DB
 
 
-
+controller.single_version = async (req, res) =>{
+    const {versionid} = req.params;
+    await version.findOne({where: {versionid: versionid},include: {model: requirements, as: "req"}}).then(data => res.json(data));
+}
 //Listagem dos filmes
 controller.add_version_product = async (req, res) => {
 
@@ -58,6 +61,43 @@ controller.add_version_product = async (req, res) => {
             });
         }
 
+    }
+    catch (e) {
+        res.json({ success: false, message: e })
+
+    }
+}
+controller.add_version_addon = async (req, res) => {
+    const { addonid, versionNum, statusid, downloadlink, releasenotes } = req.body;
+    try {
+            await version.create({
+                version: versionNum,
+                statusid: statusid,
+                downloadlink: downloadlink,
+                releasenotes: releasenotes,
+                addonid: addonid,
+                releasedate: new Date(),
+            }).then(data => {
+                res.json({ success: true, message: "Version added." })
+            });
+    }
+    catch (e) {
+        res.json({ success: false, message: e })
+
+    }
+}
+controller.edit_version_addon = async (req, res) => {
+    const {  versionNum, statusid, downloadlink, releasenotes, versionid } = req.body;
+    try {
+            await version.findOne({where :{versionid: versionid}})
+            .then(item=>{
+                item.version= versionNum;
+                item.statusid= statusid;
+                item.downloadlink= downloadlink;
+                item.releasenotes= releasenotes;
+                item.save();
+                res.json({ success: true, message: "Version edited." })
+            })
     }
     catch (e) {
         res.json({ success: false, message: e })
