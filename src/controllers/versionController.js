@@ -67,6 +67,49 @@ controller.add_version_product = async (req, res) => {
 
     }
 }
+controller.edit_version_product = async (req, res) => {
+
+    const { versionid, productid, versionNum, statusid, downloadlink, releasenotes, reqNew } = req.body;
+    try {
+        if (!reqNew) {
+            await version.findOne({where: {versionid: versionid}}).then(item=>{
+                item.version= versionNum;
+                item.statusid= statusid;
+                item.downloadlink= downloadlink;
+                item.releasenotes= releasenotes;
+                item.save();
+                res.json({ success: true, message: "Version Edited." })
+            });
+        }
+        else {
+            const reqId = await requirements.create({
+                os: reqNew.os,
+                processor: reqNew.processor,
+                ram: reqNew.ram,
+                hard_disk_space: reqNew.hard_disk_space,
+                graphic_card: reqNew.graphic_card,
+                internet_conection: reqNew.internet_conection
+            }).then(data => {
+                return data.reqid;
+            })
+            await version.findOne({where: {versionid: versionid}}).then(item=>{
+                item.version= versionNum;
+                item.statusid= statusid;
+                item.downloadlink= downloadlink;
+                item.releasenotes= releasenotes;
+                item.reqid= reqId;
+                item.save();
+                res.json({ success: true, message: "Version edited with new requirements." })
+
+            })
+        }
+
+    }
+    catch (e) {
+        res.json({ success: false, message: e })
+
+    }
+}
 controller.add_version_addon = async (req, res) => {
     const { addonid, versionNum, statusid, downloadlink, releasenotes } = req.body;
     try {
