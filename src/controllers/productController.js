@@ -1,7 +1,7 @@
 const { Op, fn, col, literal } = require('sequelize');
 var sequelize = require('../models/database');
 const initModels = require('../models/init-models');
-const { product, category, price, images, version, faq, requirements, product_status, plan, version_status } = initModels(sequelize);
+const { product, category, price, images, version, faq, requirements, product_status, plan, version_status, produtos_do_pacote, addon } = initModels(sequelize);
 const bcrypt = require('bcrypt');
 
 const controller = {}
@@ -309,7 +309,9 @@ controller.get_categories = async (req, res) => {
     await category.findAll().then(data => { res.json(data) });
 }
 controller.product_add = async (req, res) => {
-    const { name, description, statusid, features, categoryid, versionNum, vstatusid, downloadlink, releasenotes, reqNew, priceVal1, discount_percentage1, number_of_licenses1, priceVal2, discount_percentage2, number_of_licenses2, faq } = req.body;
+    const { name, description, statusid, features, categoryid, versionNum, vstatusid, downloadlink, releasenotes, reqNew, priceVal1, discount_percentage1, number_of_licenses1, priceVal2, discount_percentage2, number_of_licenses2, faqs } = req.body;
+    const transaction = await sequelize.transaction();
+
     try {
         const productid = await product.create({
             name: name,
@@ -318,23 +320,24 @@ controller.product_add = async (req, res) => {
             icon: "https://pi3-backend.onrender.com/images/products/icon/1.png", //n muda a imagem
             features: features,
             categoryid: categoryid
-        }).then(item => {
-            return item.productid
-        })
+        }, { transaction }).then(item => item.productid);
+
         await price.create({
             productid: productid,
             price: priceVal1,
             discount_percentage: discount_percentage1,
             number_of_licenses: number_of_licenses1,
             change_date: new Date()
-        })
+        }, { transaction });
+
         await price.create({
             productid: productid,
             price: priceVal2,
             discount_percentage: discount_percentage2,
             number_of_licenses: number_of_licenses2,
             change_date: new Date()
-        })
+        }, { transaction });
+
         const reqId = await requirements.create({
             os: reqNew.os,
             processor: reqNew.processor,
@@ -342,9 +345,8 @@ controller.product_add = async (req, res) => {
             hard_disk_space: reqNew.hard_disk_space,
             graphic_card: reqNew.graphic_card,
             internet_conection: reqNew.internet_conection
-        }).then(data => {
-            return data.reqid;
-        })
+        }, { transaction }).then(data => data.reqid);
+
         await version.create({
             version: versionNum,
             statusid: vstatusid,
@@ -353,74 +355,79 @@ controller.product_add = async (req, res) => {
             productid: productid,
             releasedate: new Date(),
             reqid: reqId
-        })
-        await faq.map(item => {
-            faq.create({
-                productid: productid,
-                question: item.question,
-                answer: item.answer
-            })
-        })
-        res.json({ success: true, message: "Product added." })
-    }
-    catch (e) {
-        res.json({ success: false, message: e.message })
+        }, { transaction });
+
+        await Promise.all(faqs.map(item => faq.create({
+            productid: productid,
+            question: item.question,
+            answer: item.answer
+        }, { transaction })));
+
+        // Commit the transaction if all operations are successful
+        await transaction.commit();
+
+        res.json({ success: true, message: "Product added." });
+    } catch (e) {
+        // Rollback the transaction if any operation fails
+        await transaction.rollback();
+        res.json({ success: false, message: e.message });
     }
 }
+
 controller.product_edit = async (req, res) => {
     const { productid, name, description, statusid, features, categoryid, priceid1, priceVal1, discount_percentage1, number_of_licenses1, priceid2, priceVal2, discount_percentage2, number_of_licenses2, faqs } = req.body;
+    const transaction = await sequelize.transaction();
+
     try {
 
-        await product.findOne({ where: { productid: productid } }).then(item => {
-            item.name = name;
-            item.description = description;
-            item.statusid = statusid;
-            item.features = features;
-            item.categoryid = categoryid;
-            item.save();
-        })
-        await price.findOne({ where: { priceid: priceid1 } }).then(item => {
-            item.price = priceVal1;
-            item.discount_percentage = discount_percentage1;
-            item.number_of_licenses = number_of_licenses1;
-            item.save();
-        })
-        await price.findOne({ where: { priceid: priceid2 } }).then(item => {
-            item.price = priceVal2;
-            item.discount_percentage = discount_percentage2;
-            item.number_of_licenses = number_of_licenses2;
-            item.save();
-        })
-        /*
-        await faqs.map(question => { //Edita as Faqs existentes
-            faq.findOne({ where: { questionid: question.questionid } }).then(item => {
-                item.question = question.question;
-                item.answer = question.answer;
-                item.save();
-            })
-        })*/
-        // Fetch all existing FAQs for the specific productid from the database
-        const existingFaqs = await faq.findAll({ where: { productid: productid } });
+        // Update product
+        const productItem = await product.findOne({ where: { productid }, transaction });
+        if (productItem) {
+            productItem.name = name;
+            productItem.description = description;
+            productItem.statusid = statusid;
+            productItem.features = features;
+            productItem.categoryid = categoryid;
+            await productItem.save({ transaction });
+        }
 
+        // Update prices
+        const priceItem1 = await price.findOne({ where: { priceid: priceid1 }, transaction });
+        if (priceItem1) {
+            priceItem1.price = priceVal1;
+            priceItem1.discount_percentage = discount_percentage1;
+            priceItem1.number_of_licenses = number_of_licenses1;
+            await priceItem1.save({ transaction });
+        }
+
+        const priceItem2 = await price.findOne({ where: { priceid: priceid2 }, transaction });
+        if (priceItem2) {
+            priceItem2.price = priceVal2;
+            priceItem2.discount_percentage = discount_percentage2;
+            priceItem2.number_of_licenses = number_of_licenses2;
+            await priceItem2.save({ transaction });
+        }
+
+        // Fetch all existing FAQs for the specific productid from the database
+        const existingFaqs = await faq.findAll({ where: { productid }, transaction });
 
         // Process each incoming FAQ
-        await faqs.map(question => {
+        for (const question of faqs) {
             const existingFaq = existingFaqs.find(f => f.questionid === question.questionid);
-
             if (existingFaq) {
                 // Update existing FAQ
                 existingFaq.question = question.question;
                 existingFaq.answer = question.answer;
-                existingFaq.save();
+                await existingFaq.save({ transaction });
             } else {
                 // Create new FAQ
-                faq.create({
-                    productid: productid,
+                await faq.create({
+                    productid,
                     question: question.question,
                     answer: question.answer
-                });
+                }, { transaction });
             }
-        })
+        }
 
         // Determine which existing FAQs were not in the incoming list (i.e., should be deleted)
         const incomingQuestionIds = faqs.map(f => f.questionid);
@@ -429,13 +436,65 @@ controller.product_edit = async (req, res) => {
         // Perform the deletion operations
         if (faqsToDelete.length > 0) {
             const idsToDelete = faqsToDelete.map(f => f.questionid);
-            await faq.destroy({ where: { questionid: { [Op.in]: idsToDelete } } });
+            await faq.destroy({ where: { questionid: { [Op.in]: idsToDelete } }, transaction });
         }
 
-        res.json({ success: true, message: "Product edited." })
+        // Commit the transaction if all operations are successful
+        await transaction.commit();
+
+        res.json({ success: true, message: "Product edited." });
+    } catch (e) {
+        // Rollback the transaction if any operation fails
+        await transaction.rollback();
+        res.json({ success: false, message: e.message });
     }
-    catch (e) {
-        res.json({ success: false, message: e.message })
+}
+
+controller.product_delete = async (req, res) => {
+    const { productid } = req.params;
+    const transaction = await sequelize.transaction();
+
+    try {
+        // Deleting Prices and associated Plans
+        const prices = await price.findAll({ where: { productid: productid } }, { transaction });
+        const priceIds = prices.map(price => price.priceid);
+        
+        await plan.destroy({ where: { priceid: { [Op.in]: priceIds } } }, { transaction });
+        await price.destroy({ where: { productid: productid } }, { transaction });
+
+        // Deleting FAQs
+        await faq.destroy({ where: { productid: productid } }, { transaction });
+
+        // Deleting Versions and associated Requirements
+        const versions = await version.findAll({ where: { productid: productid } }, { transaction });
+        const reqIds = versions.map(version => version.reqid);
+
+        await version.destroy({ where: { productid: productid } }, { transaction });
+        await requirements.destroy({ where: { reqid: { [Op.in]: reqIds } } }, { transaction });
+
+        // Deleting Package Products
+        await produtos_do_pacote.destroy({ where: { productid: productid } }, { transaction });
+
+        // Deleting Addons and associated Prices, Plans, and Versions
+        const addons = await addon.findAll({ where: { productid: productid } }, { transaction });
+        const addonIds = addons.map(addon => addon.addonid);
+
+        const pricesAddon = await price.findAll({ where: { addonid: { [Op.in]: addonIds } } }, { transaction });
+        const priceIdsAddon = pricesAddon.map(price => price.priceid);
+
+        await plan.destroy({ where: { priceid: { [Op.in]: priceIdsAddon } } }, { transaction });
+        await price.destroy({ where: { addonid: { [Op.in]: addonIds } } }, { transaction });
+        await version.destroy({ where: { addonid: { [Op.in]: addonIds } } }, { transaction });
+        await addon.destroy({ where: { productid: productid } }, { transaction });
+
+        // Deleting the Product itself
+        await product.destroy({ where: { productid: productid } }, { transaction });
+
+        await transaction.commit();
+        res.json({ success: true, message: "Product deleted." });
+    } catch (e) {
+        await transaction.rollback();
+        res.json({ success: false, message: e.message });
     }
 }
 

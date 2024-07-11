@@ -21,10 +21,11 @@ router.get('/', controller.products_min_list);
 router.get('/search/:search', controller.search_products_list);
 router.get('/admin/list/:search?', controller.admin_list_products);
 router.get('/admin/versions/:productid', controller.admin_versions_product)
-//router.post('/create', controller.product_add); 
+router.post('/add', controller.product_add); 
 router.post('/edit', controller.product_edit); 
 router.get('/status', controller.get_status);
 router.get('/categories', controller.get_categories);
+router.delete('/delete/:productid', controller.product_delete)
 router.get('/:id', controller.single_product);
 
 /*

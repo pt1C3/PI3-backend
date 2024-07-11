@@ -151,7 +151,7 @@ controller.add_addon = async (req, res) => {
             discount_percentage: discount_percentage,
             change_date: new Date()
         })
-       
+
         await version.create({
             version: versionNum,
             statusid: vstatusid,
@@ -198,6 +198,26 @@ controller.edit_addon = async (req, res) => {
         res.json({ success: true, message: "Addon edited." });
     } catch (e) {
         res.json({ success: false, message: e.message || e.toString() });
+    }
+}
+controller.delete_addon = async (req, res) => {
+    const { addonid } = req.params;
+    const transaction = await sequelize.transaction();
+
+    try {
+        // Deleting Addons and associated Prices, Plans, and Versions
+        const pricesAddon = await price.findAll({ where: { addonid: addonid } }, { transaction });
+        const priceIdsAddon = pricesAddon.map(price => price.priceid);
+
+        await plan.destroy({ where: { priceid: { [Op.in]: priceIdsAddon } } }, { transaction });
+        await price.destroy({ where: { addonid: addonid } }, { transaction });
+        await version.destroy({ where: { addonid: addonid } }, { transaction });
+        await addon.destroy({ where: { addonid: addonid } }, { transaction });
+        await transaction.commit();
+        res.json({ success: true, message: "Addon deleted." });
+    } catch (e) {
+        await transaction.rollback();
+        res.json({ success: false, message: e.message });
     }
 }
 controller.single_addon = async (req, res) => {
