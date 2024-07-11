@@ -7,9 +7,9 @@ const controller = {}
 sequelize.sync(); //Sincroniza com a DB
 
 
-controller.single_version = async (req, res) =>{
-    const {versionid} = req.params;
-    await version.findOne({where: {versionid: versionid},include: {model: requirements, as: "req"}}).then(data => res.json(data));
+controller.single_version = async (req, res) => {
+    const { versionid } = req.params;
+    await version.findOne({ where: { versionid: versionid }, include: { model: requirements, as: "req" } }).then(data => res.json(data));
 }
 //Listagem dos filmes
 controller.add_version_product = async (req, res) => {
@@ -72,11 +72,11 @@ controller.edit_version_product = async (req, res) => {
     const { versionid, productid, versionNum, statusid, downloadlink, releasenotes, reqNew } = req.body;
     try {
         if (!reqNew) {
-            await version.findOne({where: {versionid: versionid}}).then(item=>{
-                item.version= versionNum;
-                item.statusid= statusid;
-                item.downloadlink= downloadlink;
-                item.releasenotes= releasenotes;
+            await version.findOne({ where: { versionid: versionid } }).then(item => {
+                item.version = versionNum;
+                item.statusid = statusid;
+                item.downloadlink = downloadlink;
+                item.releasenotes = releasenotes;
                 item.save();
                 res.json({ success: true, message: "Version Edited." })
             });
@@ -92,12 +92,12 @@ controller.edit_version_product = async (req, res) => {
             }).then(data => {
                 return data.reqid;
             })
-            await version.findOne({where: {versionid: versionid}}).then(item=>{
-                item.version= versionNum;
-                item.statusid= statusid;
-                item.downloadlink= downloadlink;
-                item.releasenotes= releasenotes;
-                item.reqid= reqId;
+            await version.findOne({ where: { versionid: versionid } }).then(item => {
+                item.version = versionNum;
+                item.statusid = statusid;
+                item.downloadlink = downloadlink;
+                item.releasenotes = releasenotes;
+                item.reqid = reqId;
                 item.save();
                 res.json({ success: true, message: "Version edited with new requirements." })
 
@@ -113,16 +113,16 @@ controller.edit_version_product = async (req, res) => {
 controller.add_version_addon = async (req, res) => {
     const { addonid, versionNum, statusid, downloadlink, releasenotes } = req.body;
     try {
-            await version.create({
-                version: versionNum,
-                statusid: statusid,
-                downloadlink: downloadlink,
-                releasenotes: releasenotes,
-                addonid: addonid,
-                releasedate: new Date(),
-            }).then(data => {
-                res.json({ success: true, message: "Version added." })
-            });
+        await version.create({
+            version: versionNum,
+            statusid: statusid,
+            downloadlink: downloadlink,
+            releasenotes: releasenotes,
+            addonid: addonid,
+            releasedate: new Date(),
+        }).then(data => {
+            res.json({ success: true, message: "Version added." })
+        });
     }
     catch (e) {
         res.json({ success: false, message: e })
@@ -130,14 +130,14 @@ controller.add_version_addon = async (req, res) => {
     }
 }
 controller.edit_version_addon = async (req, res) => {
-    const {  versionNum, statusid, downloadlink, releasenotes, versionid } = req.body;
+    const { versionNum, statusid, downloadlink, releasenotes, versionid } = req.body;
     try {
-            await version.findOne({where :{versionid: versionid}})
-            .then(item=>{
-                item.version= versionNum;
-                item.statusid= statusid;
-                item.downloadlink= downloadlink;
-                item.releasenotes= releasenotes;
+        await version.findOne({ where: { versionid: versionid } })
+            .then(item => {
+                item.version = versionNum;
+                item.statusid = statusid;
+                item.downloadlink = downloadlink;
+                item.releasenotes = releasenotes;
                 item.save();
                 res.json({ success: true, message: "Version edited." })
             })
@@ -145,6 +145,19 @@ controller.edit_version_addon = async (req, res) => {
     catch (e) {
         res.json({ success: false, message: e })
 
+    }
+}
+controller.delete_version = async (req, res) => {
+    const { versionid } = req.params;
+    const transaction = await sequelize.transaction();
+
+    try {
+        await version.destroy({ where: { versionid: versionid } }, { transaction });
+        await transaction.commit();
+        res.json({ success: true, message: "Version deleted." });
+    } catch (e) {
+        await transaction.rollback();
+        res.json({ success: false, message: e.message });
     }
 }
 controller.get_status = async (req, res) => {

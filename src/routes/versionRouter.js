@@ -8,5 +8,6 @@ router.post('/product/create/', controller.add_version_product);
 router.post('/product/edit/', controller.edit_version_product);
 router.post('/addon/create/', controller.add_version_addon);
 router.post('/addon/edit/', controller.edit_version_addon);
+router.delete('/delete/:versionid', controller.delete_version);
 router.get('/status', controller.get_status)
 module.exports = router;
