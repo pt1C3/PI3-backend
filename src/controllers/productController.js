@@ -56,7 +56,7 @@ controller.products_min_list = async (req, res) => {
 controller.single_product = async (req, res) => {
     const productId = req.params.id; // Assuming the product ID is passed as a route parameter
     await product.findByPk(productId, {
-        attributes: ['productid', 'name', 'description', 'icon', 'features'],
+        attributes: ['productid', 'name', 'description', 'icon', 'features', 'statusid'],
         include: [
             {
                 model: category,
@@ -70,6 +70,7 @@ controller.single_product = async (req, res) => {
             {
                 model: faq,
                 as: 'faqs',
+                attributes: ['questionid', 'question', 'answer'],
                 separate: true,
             },
             {
@@ -118,19 +119,6 @@ controller.single_product = async (req, res) => {
         console.error('Error fetching product details:', error);
         res.status(500).json({ message: 'An error occurred while fetching the product details.' });
     });
-}
-
-controller.product_add = async (req, res) => {
-    product.create({ //Criamos o item com a informação do request
-        name: req.body.name,
-        description: req.body.description,
-        statusid: req.body.status,
-        //icon: req.file.filename, //O ficheiro é recebido através do multer no filmesRouter.js
-        features: req.body.features,
-        categoryid: req.body.categoryid
-    }).then(item => {
-        res.json(item); //Finalmente devolvemos o item criado
-    })
 }
 
 controller.search_products_list = async (req, res) => {
@@ -193,7 +181,7 @@ controller.admin_list_products = async (req, res) => {
                     'productid',
                     'name',
                     'icon',
-                    'description'
+                    'description',
                 ],
                 where: {
                     name: {
@@ -295,6 +283,7 @@ controller.admin_list_products = async (req, res) => {
         });
 
 }
+
 controller.admin_versions_product = async (req, res) => {
     const productid = req.params.productid;
 
@@ -305,14 +294,149 @@ controller.admin_versions_product = async (req, res) => {
         include: [{
             model: version_status,
             as: "status"
-        },{
+        }, {
             model: product,
             as: "product",
             attributes: ['name']
         }]
     }).then(data => { res.json(data) });
 }
-controller.get_status =async (req, res) =>{
-    await product_status.findAll().then(data=>res.json(data));
+
+controller.get_status = async (req, res) => {
+    await product_status.findAll().then(data => res.json(data));
 }
+controller.get_categories = async (req, res) => {
+    await category.findAll().then(data => { res.json(data) });
+}
+controller.product_add = async (req, res) => {
+    const { name, description, statusid, features, categoryid, versionNum, vstatusid, downloadlink, releasenotes, reqNew, priceVal1, discount_percentage1, number_of_licenses1, priceVal2, discount_percentage2, number_of_licenses2, faq } = req.body;
+    try {
+        const productid = await product.create({
+            name: name,
+            description: description,
+            statusid: statusid,
+            icon: "https://pi3-backend.onrender.com/images/products/icon/1.png", //n muda a imagem
+            features: features,
+            categoryid: categoryid
+        }).then(item => {
+            return item.productid
+        })
+        await price.create({
+            productid: productid,
+            price: priceVal1,
+            discount_percentage: discount_percentage1,
+            number_of_licenses: number_of_licenses1,
+            change_date: new Date()
+        })
+        await price.create({
+            productid: productid,
+            price: priceVal2,
+            discount_percentage: discount_percentage2,
+            number_of_licenses: number_of_licenses2,
+            change_date: new Date()
+        })
+        const reqId = await requirements.create({
+            os: reqNew.os,
+            processor: reqNew.processor,
+            ram: reqNew.ram,
+            hard_disk_space: reqNew.hard_disk_space,
+            graphic_card: reqNew.graphic_card,
+            internet_conection: reqNew.internet_conection
+        }).then(data => {
+            return data.reqid;
+        })
+        await version.create({
+            version: versionNum,
+            statusid: vstatusid,
+            downloadlink: downloadlink,
+            releasenotes: releasenotes,
+            productid: productid,
+            releasedate: new Date(),
+            reqid: reqId
+        })
+        await faq.map(item => {
+            faq.create({
+                productid: productid,
+                question: item.question,
+                answer: item.answer
+            })
+        })
+        res.json({ success: true, message: "Product added." })
+    }
+    catch (e) {
+        res.json({ success: false, message: e.message })
+    }
+}
+controller.product_edit = async (req, res) => {
+    const { productid, name, description, statusid, features, categoryid, priceid1, priceVal1, discount_percentage1, number_of_licenses1, priceid2, priceVal2, discount_percentage2, number_of_licenses2, faqs } = req.body;
+    try {
+
+        await product.findOne({ where: { productid: productid } }).then(item => {
+            item.name = name;
+            item.description = description;
+            item.statusid = statusid;
+            item.features = features;
+            item.categoryid = categoryid;
+            item.save();
+        })
+        await price.findOne({ where: { priceid: priceid1 } }).then(item => {
+            item.price = priceVal1;
+            item.discount_percentage = discount_percentage1;
+            item.number_of_licenses = number_of_licenses1;
+            item.save();
+        })
+        await price.findOne({ where: { priceid: priceid2 } }).then(item => {
+            item.price = priceVal2;
+            item.discount_percentage = discount_percentage2;
+            item.number_of_licenses = number_of_licenses2;
+            item.save();
+        })
+        /*
+        await faqs.map(question => { //Edita as Faqs existentes
+            faq.findOne({ where: { questionid: question.questionid } }).then(item => {
+                item.question = question.question;
+                item.answer = question.answer;
+                item.save();
+            })
+        })*/
+        // Fetch all existing FAQs for the specific productid from the database
+        const existingFaqs = await faq.findAll({ where: { productid: productid } });
+
+
+        // Process each incoming FAQ
+        await faqs.map(question => {
+            const existingFaq = existingFaqs.find(f => f.questionid === question.questionid);
+
+            if (existingFaq) {
+                // Update existing FAQ
+                existingFaq.question = question.question;
+                existingFaq.answer = question.answer;
+                existingFaq.save();
+            } else {
+                // Create new FAQ
+                faq.create({
+                    productid: productid,
+                    question: question.question,
+                    answer: question.answer
+                });
+            }
+        })
+
+        // Determine which existing FAQs were not in the incoming list (i.e., should be deleted)
+        const incomingQuestionIds = faqs.map(f => f.questionid);
+        const faqsToDelete = existingFaqs.filter(f => !incomingQuestionIds.includes(f.questionid));
+
+        // Perform the deletion operations
+        if (faqsToDelete.length > 0) {
+            const idsToDelete = faqsToDelete.map(f => f.questionid);
+            await faq.destroy({ where: { questionid: { [Op.in]: idsToDelete } } });
+        }
+
+        res.json({ success: true, message: "Product edited." })
+    }
+    catch (e) {
+        res.json({ success: false, message: e.message })
+    }
+}
+
 module.exports = controller;
