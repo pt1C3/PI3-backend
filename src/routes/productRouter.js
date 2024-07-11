@@ -22,7 +22,9 @@ router.get('/search/:search', controller.search_products_list);
 //router.post('/create', controller.produtos_add); 
 router.get('/admin/list/:search?', controller.admin_list_products);
 router.get('/admin/versions/:productid', controller.admin_versions_product)
+router.get('/status', controller.get_status);
 router.get('/:id', controller.single_product);
+
 /*
 router.get('/soum', controller.apenasum);
 router.put('/update/:id', upload.single('foto'), controller.filme_update); //O middleware é chamado antes do controller

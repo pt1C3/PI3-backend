@@ -39,7 +39,7 @@ controller.admin_list_addon = async (req, res) => {
                         attributes: [
                             'priceid',
                             [fn('ROUND', col('price'), 2), 'price'], // Format price to 2 decimal points
-                            ],
+                        ],
                         where: {
                             custom: {
                                 [Op.or]: [false, null] // Ensure correct boolean condition
@@ -114,7 +114,7 @@ controller.admin_list_addon = async (req, res) => {
         });
 }
 
-controller.admin_versions_addon = async (req, res)=>{
+controller.admin_versions_addon = async (req, res) => {
     const addonid = req.params.addonid;
 
     await version.findAll({
@@ -124,7 +124,7 @@ controller.admin_versions_addon = async (req, res)=>{
         include: [{
             model: version_status,
             as: "status"
-        },{
+        }, {
             model: addon,
             as: "addon",
             attributes: ['name', 'productid'],
@@ -135,9 +135,85 @@ controller.admin_versions_addon = async (req, res)=>{
         }]
     }).then(data => { res.json(data) });
 }
+controller.add_addon = async (req, res) => {
+    const { name, status, description, productid, priceVal, discount_percentage, versionNum, vstatusid, download, releasenotes } = req.body;
+    try {
+        const addonid = await addon.create({
+            name: name,
+            status: status,
+            description: description,
+            productid: productid
+        }).then(item => { return item.addonid })
 
-controller.single_addon = async (req,res)=>{
-    const {addonid} = req.params;
-    await addon.findOne({where: {addonid: addonid}}).then(data => res.json(data));
+        await price.create({
+            addonid: addonid,
+            price: priceVal,
+            discount_percentage: discount_percentage,
+            change_date: new Date()
+        })
+       
+        await version.create({
+            version: versionNum,
+            statusid: vstatusid,
+            downloadlink: download,
+            releasenotes: releasenotes,
+            addonid: addonid,
+            releasedate: new Date(),
+        })
+        res.json({ success: true, message: "Addon added." });
+
+    }
+    catch (e) {
+        res.json({ success: false, message: e })
+
+    }
+}
+controller.edit_addon = async (req, res) => {
+    const { addonid, name, status, description, productid, priceid, priceVal, discount_percentage } = req.body;
+
+
+    try {
+        // Find and update the addon
+        const addonItem = await addon.findOne({ where: { addonid: addonid } });
+        if (!addonItem) {
+            return res.json({ success: false, message: "Addon not found." });
+        }
+        addonItem.name = name;
+        addonItem.status = status;
+        addonItem.description = description;
+        addonItem.productid = productid;
+        await addonItem.save();
+
+        // Find and update the price
+        const priceItem = await price.findOne({ where: { priceid: priceid } });
+        if (!priceItem) {
+            return res.json({ success: false, message: "Price not found." });
+        }
+        priceItem.price = priceVal;
+        priceItem.discount_percentage = discount_percentage;
+        priceItem.change_date = new Date();
+        await priceItem.save();
+
+        // If both operations were successful
+        res.json({ success: true, message: "Addon edited." });
+    } catch (e) {
+        res.json({ success: false, message: e.message || e.toString() });
+    }
+}
+controller.single_addon = async (req, res) => {
+    const { addonid } = req.params;
+    await addon.findOne({
+        where: { addonid: addonid },
+        include: {
+            model: price,
+            as: 'prices',
+            attributes: [
+                'priceid',
+                [fn('ROUND', col('price'), 2), 'price'], // Format price to 2 decimal points
+                'discount_percentage'
+            ],
+            limit: 1
+        },
+    }).then(data => res.json(data));
 }
 module.exports = controller;

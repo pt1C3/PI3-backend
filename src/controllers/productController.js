@@ -312,5 +312,7 @@ controller.admin_versions_product = async (req, res) => {
         }]
     }).then(data => { res.json(data) });
 }
-
+controller.get_status =async (req, res) =>{
+    await product_status.findAll().then(data=>res.json(data));
+}
 module.exports = controller;
