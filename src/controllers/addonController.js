@@ -236,4 +236,28 @@ controller.single_addon = async (req, res) => {
         },
     }).then(data => res.json(data));
 }
+
+controller.addon_list = async (req, res) => {
+    const { productid } = req.params;
+    try {
+        await addon.findAll({
+            where: {
+                status: 2,
+                productid: productid
+            },
+            include: [
+                {
+                    model: price,
+                    as: 'prices'
+                }
+            ]
+        }).then(data => {
+            res.json(data)
+        })
+    }
+    catch(e)
+    {
+        res.json({success: false, message: e.message})
+    }
+}
 module.exports = controller;

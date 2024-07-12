@@ -25,6 +25,10 @@ router.get('/free', controller.free_users_list);
 router.post('/login', controller.login);
 router.post('/create', controller.create_user)
 router.get('/plans/:businessid', controller.user_plans);
+router.get('/addon/plans/:businessid', controller.user_addon_plans);
+
 router.get('/payments', controller.payments);
+router.get('/history/:businessid', controller.payment_history);
+
 router.get('/encrypt', controller.encrypt_passwords);
 module.exports = router;

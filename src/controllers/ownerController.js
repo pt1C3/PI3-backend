@@ -1,7 +1,7 @@
 const { Op, fn, col, literal } = require('sequelize');
 var sequelize = require('../models/database');
 const initModels = require('../models/init-models');
-const { USER, plan, payment, product, category, price, business, license } = initModels(sequelize);
+const { USER, plan, payment, product, category, price, business, license, addon } = initModels(sequelize);
 const config = require('../config');
 
 const controller = {}
@@ -47,7 +47,7 @@ controller.licenses_list = async (req, res) => {
                 }]
             }
             ]
-        }).then(data => {res.json(data); });
+        }).then(data => { res.json(data); });
     }
     catch (e) {
         res.json(e);
@@ -83,7 +83,7 @@ controller.payment_plan_add = async (req, res) => {
     // Create the payment
     const createdPayment = await payment.create({
         planid: createdPlan.planid,
-        pstatusid: 1,
+        pstatusid: 2,
         payment_date: nowDate,
         due_date: nowDate
     }).then(data => { return data });
@@ -105,14 +105,34 @@ controller.payment_plan_add = async (req, res) => {
         payment: createdPayment,
         nLicenses: nLicenses
     });
-    /*} catch (error) {
-        // Handle errors and send an error response
-        res.status(500).json({
-            success: false,
-            message: 'An error occurred while creating the payment plan.',
-            error: error.message
-        });
-    }*/
+
+};
+controller.payment_plan_addon_add = async (req, res) => {
+    const nowDate = new Date();
+    // Create the plan
+    const createdPlan = await plan.create({
+        priceid: req.body.priceid,
+        sale_date: nowDate,
+        businessid: req.body.businessid,
+        planstatusid: 2
+    }).then(data => { return data });
+
+    // Create the payment
+    const createdPayment = await payment.create({
+        planid: createdPlan.planid,
+        pstatusid: 2,
+        payment_date: nowDate,
+        due_date: nowDate
+    }).then(data => { return data });
+
+
+    // Respond with both created items
+    res.json({
+        success: true,
+        plan: createdPlan,
+        payment: createdPayment,
+    });
+
 };
 
 controller.cancel_plan = async (req, res) => {
@@ -306,14 +326,17 @@ controller.get_products = async (req, res) => {
                     {
                         model: price,
                         as: "price",
+                        where: {
+                            addonid: null
+                        },
                         include: [
                             {
                                 model: product,
-                                as: "product"
+                                as: "product",
                             }
                         ]
                     },
-                    
+
                 ],
 
             }
@@ -323,5 +346,38 @@ controller.get_products = async (req, res) => {
         res.json({ success: false, message: e.message })
     }
 }
+controller.get_addons = async (req, res) => {
+    const { businessid, productid } = req.params;
+    try {
+        await plan.findAll({
+            where: {
+                businessid: businessid
+            },
+            include: [
+                {
+                    model: price,
+                    as: "price",
+                    where: {
+                        productid: null
+                    },
+                    include: [
+                        {
+                            model: addon,
+                            as: "addon",
+                            where: {
+                                productid: productid
+                            }
+                        }
+                    ]
+                }
+            ]
 
+        }).then(data => {
+            res.json(data)
+        })
+    }
+    catch (e) {
+        res.json({ success: false, message: e.message })
+    }
+}
 module.exports = controller;

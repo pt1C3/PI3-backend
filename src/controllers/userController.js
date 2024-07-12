@@ -1,7 +1,7 @@
 const { Op, fn, col, literal } = require('sequelize');
 var sequelize = require('../models/database');
 const initModels = require('../models/init-models');
-const { USER, plan, payment, product, category, price, business } = initModels(sequelize);
+const { USER, plan, payment, payment_status, product, category, price, business, addon } = initModels(sequelize);
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
@@ -51,8 +51,6 @@ controller.login = async (req, res) => {
 
 }
 
-
-
 controller.user_plans = async (req, res) => {
     const businessid = req.params.businessid;
 
@@ -70,6 +68,9 @@ controller.user_plans = async (req, res) => {
                         'number_of_licenses',
                         'priceid'
                     ],
+                    where: {
+                        addonid: null
+                    },
                     include: [
                         {
                             model: product,
@@ -118,6 +119,89 @@ controller.user_plans = async (req, res) => {
                 return {
                     ...item.toJSON(),
                     product: item.price.product.toJSON(),
+                };
+            }
+        }));
+
+        res.json(processedPlans);
+    } catch (error) {
+        console.error('Error fetching user plans:', error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while fetching user plans.',
+            error: error.message
+        });
+    }
+};
+
+controller.user_addon_plans = async (req, res) => {
+    const businessid = req.params.businessid;
+
+    try {
+        const plans = await plan.findAll({
+            attributes: [[fn('DATE', col('sale_date')), 'sale_date'], 'planid', 'planstatusid'],
+            where: { businessid: businessid },
+            order: [['planstatusid', 'DESC']],
+            include: [
+                {
+                    model: price,
+                    as: 'price',
+                    attributes: [
+                        [fn('ROUND', col('price'), 2), 'price'], // Format price to 2 decimal points
+                        'number_of_licenses',
+                        'priceid'
+                    ],
+                    where: {
+                        productid: null
+                    },
+                    include: [
+                        {
+                            model: addon,
+                            as: 'addon'
+                        }
+                    ]
+                },
+                {
+                    model: payment,
+                    as: 'payments',
+                    attributes: [
+                        'payment_date',
+                        [fn('DATE', col('due_date')), 'due_date'],
+                        'pstatusid'
+                    ], order: [['due_date', 'DESC']], // Get the latest payment first
+                    limit: 1 // Limit to one latest payment
+                }
+            ]
+        });
+
+        // Process plans to create a new payment with updated due_date
+        const processedPlans = await Promise.all(plans.map(async (item) => {
+            const latestPayment = item.payments[0]; // Assuming payments are ordered by due_date DESC
+
+            if (latestPayment && latestPayment.payment_date) {
+                const previousDueDate = latestPayment.due_date;
+                const newDueDate = new Date(previousDueDate);
+                newDueDate.setMonth(newDueDate.getMonth() + 1); // Add one month to the previous due_date
+
+                // Create a new payment with extended due_date and null payment_date
+                const createdPayment = await payment.create({
+                    planid: item.planid,
+                    pstatusid: 1,
+                    payment_date: null,
+                    due_date: newDueDate
+                });
+
+                // Return plan with updated payment information
+                return {
+                    ...item.toJSON(),
+                    addon: item.price.addon.toJSON(),
+
+                };
+            } else {
+                // No previous payment or payment not paid yet
+                return {
+                    ...item.toJSON(),
+                    addon: item.price.addon.toJSON(),
                 };
             }
         }));
@@ -212,7 +296,56 @@ controller.plans_list = async (req, res) => {
 controller.payments = async (req, res) => {
     await payment.findAll().then(data => { res.json(data) })
 }
+controller.payment_history = async (req, res) => {
+    const businessid = req.params.businessid;
 
+    try {
+        const userPlans = await plan.findAll({ where: { businessid: businessid } }).then(data => { return data });
+        const planIds = userPlans.map(plan => plan.planid);
+        await payment.findAll(
+            {
+                where: { planid: { [Op.in]: planIds } },
+                include: [
+                    {
+                        model: plan,
+                        as: "plan",
+                        include: [
+                            {
+                                model: price,
+                                as: "price",
+                                include: [
+                                    {
+                                        model: product,
+                                        as: "product",
+                                        include: [
+                                            {
+                                                model: category,
+                                                as: "category"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        model: addon,
+                                        as: "addon",
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        model: payment_status,
+                        as: "pstatus"
+                    }
+                ]
+            }
+        ).then(data => {
+            res.json(data)
+        })
+    }
+    catch (e) {
+        res.json({ success: false, message: e.message })
+    }
+}
 controller.encrypt_passwords = async (req, res) => {
     try {
         // Start a transaction
