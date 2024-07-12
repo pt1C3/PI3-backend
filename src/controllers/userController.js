@@ -57,7 +57,7 @@ controller.user_plans = async (req, res) => {
     try {
         const plans = await plan.findAll({
             attributes: [[fn('DATE', col('sale_date')), 'sale_date'], 'planid', 'planstatusid'],
-            where: { businessid: businessid },
+            where: { businessid: businessid , planstatusid: 2 },
             order: [['planstatusid', 'DESC']],
             include: [
                 {
@@ -140,7 +140,7 @@ controller.user_addon_plans = async (req, res) => {
     try {
         const plans = await plan.findAll({
             attributes: [[fn('DATE', col('sale_date')), 'sale_date'], 'planid', 'planstatusid'],
-            where: { businessid: businessid },
+            where: { businessid: businessid, planstatusid: 2 },
             order: [['planstatusid', 'DESC']],
             include: [
                 {

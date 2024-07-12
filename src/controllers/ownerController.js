@@ -174,8 +174,8 @@ controller.cancel_plan = async (req, res) => {
 
         res.json({ message: "Plan deactivated" + "(payment " + latestPayment + ") (licenses " + licenses + ")", success: true })
     }
-    catch (error) {
-        res.send(error)
+    catch (e) {
+        res.json({success: false, message: e.message})
     }
 }
 
@@ -351,7 +351,8 @@ controller.get_addons = async (req, res) => {
     try {
         await plan.findAll({
             where: {
-                businessid: businessid
+                businessid: businessid,
+                planstatusid: 2
             },
             include: [
                 {
