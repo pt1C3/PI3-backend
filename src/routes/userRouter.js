@@ -30,9 +30,4 @@ router.get('/addon/plans/:businessid', controller.user_addon_plans);
 router.get('/payments', controller.payments);
 router.get('/history/:businessid', controller.payment_history);
 
-
-router.get('/inserts', controller.inserts)
-router.get('/updates', controller.updates)
-
-router.get('/encrypt', controller.encrypt_passwords);
 module.exports = router;
