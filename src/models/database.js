@@ -1,25 +1,24 @@
 var Sequelize = require('sequelize');
 const sequelize = new Sequelize(
-   /*
 
- 'pi3_qpsn',
-  'pi3_qpsn_user',
-  'YHxHh12yMpPSSXJ34p7fPpZa8s3cnDOm',
+  'pi3_sjgj',
+  'pi3_sjgj_user',
+  'DCc7o211liCAVBNTpPpBayD5xcCb44T8',
   {
-    host: 'dpg-cptcv056l47c73edk2pg-a',
+    host: 'dpg-cq8kr0tds78s73dle740-a',
     port: '5432',
     dialect: 'postgres'
-  }*/  
- 
-  'pi3',
-  'postgres',
-  '123',
-  {
-      host: 'localhost',
-      port: '5432',
-      dialect: 'postgres'
   }
-      
+  /*
+   'pi3',
+   'postgres',
+   '123',
+   {
+       host: 'localhost',
+       port: '5432',
+       dialect: 'postgres'
+   }
+       */
 );
 sequelize.sync();
 sequelize.authenticate()
