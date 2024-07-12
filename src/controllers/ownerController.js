@@ -323,22 +323,5 @@ controller.get_products = async (req, res) => {
         res.json({ success: false, message: e.message })
     }
 }
-controller.plan_licenses = async (req, res) => {
-    //ACABAR
-    const businessid = req.params.businessid;
-    try {
-        await plan.findAll({
-            where: { businessid: businessid, planstatusid: 2 },
-            include: [{
-                model: license,
-                as: "licenses",
-            }
-            ]
-        }).then(data => {  res.json(data); });
-    }
-    catch (e) {
-        res.json(e);
-    }
 
-};
 module.exports = controller;
