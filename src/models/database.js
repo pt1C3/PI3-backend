@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
     dialect: 'postgres'
   }*/  
  
-  'pi3',
+  'teste',
   'postgres',
   '123',
   {

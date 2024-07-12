@@ -26,15 +26,5 @@ router.post('/login', controller.login);
 router.post('/create', controller.create_user)
 router.get('/plans/:businessid', controller.user_plans);
 router.get('/payments', controller.payments);
-
-//router.get('/soum', controller.apenasum);
-
-//router.post('/create', /*upload.single('foto'),*/ controller.produtos_add); //O middleware é chamado antes do controller
-/*
-router.get('/soum', controller.apenasum);
-router.put('/update/:id', upload.single('foto'), controller.filme_update); //O middleware é chamado antes do controller
-router.delete('/delete/:id', controller.filme_delete);
-router.get('/count/', controller.filmes_count);
-router.get('/genero-count', controller.filme_genero_count);
-*/
+router.get('/encrypt', controller.encrypt_passwords);
 module.exports = router;

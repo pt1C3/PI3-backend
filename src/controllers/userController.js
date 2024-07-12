@@ -146,12 +146,13 @@ controller.create_user = async (req, res) => {
     }
     else {
 
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const createdUser = await USER.create({
             firstname: firstname,
             lastname: lastname,
             email: email,
-            password: password,
+            password: hashedPassword,
             country: country,
             phone_number: phone_number,
             image: 'https://pi3-backend.onrender.com/images/users/1.png',
@@ -210,5 +211,30 @@ controller.plans_list = async (req, res) => {
 }
 controller.payments = async (req, res) => {
     await payment.findAll().then(data => { res.json(data) })
+}
+
+controller.encrypt_passwords = async (req, res) => {
+    try {
+        // Start a transaction
+        const transaction = await sequelize.transaction();
+
+        // Fetch all users
+        const users = await USER.findAll({ transaction });
+
+        // Iterate over each user
+        for (const user of users) {
+            const hashedPassword = await bcrypt.hash(user.password, 10);
+            user.password = hashedPassword;
+            await user.save({ transaction });
+        }
+
+        // Commit the transaction
+        await transaction.commit();
+        console.log('Passwords encrypted successfully.');
+    } catch (error) {
+        // Rollback the transaction in case of error
+        await transaction.rollback();
+        console.error('Error encrypting passwords:', error);
+    }
 }
 module.exports = controller;
