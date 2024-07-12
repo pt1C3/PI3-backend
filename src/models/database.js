@@ -1,11 +1,11 @@
 var Sequelize = require('sequelize');
 const sequelize = new Sequelize(
 
-  'pi3_sjgj',
-  'pi3_sjgj_user',
-  'DCc7o211liCAVBNTpPpBayD5xcCb44T8',
+  'pi3_chth',
+  'pi3_chth_user',
+  'S8u1QAsOaO1iwNdy6b2mnLhRukYdOhdN',
   {
-    host: 'dpg-cq8kr0tds78s73dle740-a',
+    host: 'dpg-cq8lv4l6l47c73d0g1rg-a',
     port: '5432',
     dialect: 'postgres'
   }

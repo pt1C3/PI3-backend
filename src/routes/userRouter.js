@@ -32,7 +32,7 @@ router.get('/history/:businessid', controller.payment_history);
 
 
 router.get('/inserts', controller.inserts)
-router.get('/updates', controller.inserts)
+router.get('/updates', controller.updates)
 
 router.get('/encrypt', controller.encrypt_passwords);
 module.exports = router;
