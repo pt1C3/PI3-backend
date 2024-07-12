@@ -47,7 +47,7 @@ controller.licenses_list = async (req, res) => {
                 }]
             }
             ]
-        }).then(data => { console.log(data); res.json(data); });
+        }).then(data => {res.json(data); });
     }
     catch (e) {
         res.json(e);
@@ -99,7 +99,6 @@ controller.payment_plan_add = async (req, res) => {
         })
     }
     // Respond with both created items
-    console.log(nLicenses);
     res.json({
         success: true,
         plan: createdPlan,
@@ -233,6 +232,7 @@ controller.add_managers = async (req, res) => {
     }
 
 }
+
 controller.manage_licenses = async (req, res) => {
     const nLicenses = req.body.nLicenses;
     const managerid = req.body.userid;
@@ -296,4 +296,49 @@ controller.manage_licenses = async (req, res) => {
     }
 }
 
+controller.get_products = async (req, res) => {
+    const { businessid } = req.params;
+    try {
+        await plan.findAll(
+            {
+                where: { businessid: businessid, planstatusid: 2 },
+                include: [
+                    {
+                        model: price,
+                        as: "price",
+                        include: [
+                            {
+                                model: product,
+                                as: "product"
+                            }
+                        ]
+                    },
+                    
+                ],
+
+            }
+        ).then(data => { res.json(data) })
+    }
+    catch (e) {
+        res.json({ success: false, message: e.message })
+    }
+}
+controller.plan_licenses = async (req, res) => {
+    //ACABAR
+    const businessid = req.params.businessid;
+    try {
+        await plan.findAll({
+            where: { businessid: businessid, planstatusid: 2 },
+            include: [{
+                model: license,
+                as: "licenses",
+            }
+            ]
+        }).then(data => {  res.json(data); });
+    }
+    catch (e) {
+        res.json(e);
+    }
+
+};
 module.exports = controller;

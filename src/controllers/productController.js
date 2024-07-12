@@ -458,7 +458,7 @@ controller.product_delete = async (req, res) => {
         // Deleting Prices and associated Plans
         const prices = await price.findAll({ where: { productid: productid } }, { transaction });
         const priceIds = prices.map(price => price.priceid);
-        
+
         await plan.destroy({ where: { priceid: { [Op.in]: priceIds } } }, { transaction });
         await price.destroy({ where: { productid: productid } }, { transaction });
 
